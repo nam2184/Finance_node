@@ -1,0 +1,37 @@
+.box {
+    background-color:transparent;
+    left:0;
+    top:0;
+    width:100%;
+    position: fixed;
+    padding:20px;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    z-index:100;
+}
+
+
+.navbar a{
+    text-decoration: none;
+    color:white;
+    font-size:25px;
+    position:relative;
+    right:100px;
+    margin-right:50px;
+    font-weight:500;
+    transition:.3s;
+}
+
+.navbar a:hover {
+    color:rgb(74, 74, 229);
+
+}
+.logo {
+    text-decoration: none;
+    color:white;
+    font-size:30px;
+    position:relative;
+    left:150px;
+    font-weight:500;
+}
