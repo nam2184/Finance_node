@@ -4,22 +4,9 @@ from requests_cache import CacheMixin,SQLiteCache
 from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
 from pyrate_limiter import Duration, RequestRate, Limiter
 import yfinance as yf
-import time
-import logging
 import copy
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-def timer(func):
-        def wrapper(*args,**kwargs):
-            logger.info("Start Execution")
-            t1 = time.time() 
-            result = func(*args,**kwargs)
-            t2 = time.time()
-            logger.info(f'Time : {str(t2-t1)}')
-            return result
-        return wrapper
+import pandas as pd
+from utils import timer
 
 class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
     pass
@@ -33,42 +20,85 @@ class Scrape:
                                             backend=SQLiteCache('yfinance.cache'))
 
     @timer
-    def scrape(self,ticker):
-        try :
-            data = yf.Ticker(ticker,session=self._session)
-        except:
-            print("Failure to retrieve information")
-        return data
+    def scrape(func):
+        def wrapper(self,ticker,*args,**kwargs):
+            if ticker != self._global_ticker :
+                self._global_ticker = copy.deepcopy(ticker)
+                try :
+                    self._data = yf.Ticker(ticker,session=self._session)
+                except:
+                    print("Failure to retrieve information")
+            result = func(self,ticker=ticker,*args,**kwargs)
+            return result
+        return wrapper
 
-    @timer  
-    def retrieveHistory(self,ticker=None, timeframe='1y'):
-        if ticker != self._global_ticker :
-            self._data = self.scrape(ticker=ticker)
-            self._global_ticker = copy.deepcopy(ticker)
+    @scrape  
+    def retrieveHistory(self,ticker=None, timeframe='1y') -> pd.DataFrame :
         history_df = self._data.history(period=timeframe)
         return history_df
 
-    @timer
-    def retrieveHolders(self,ticker=None):
-        if ticker != self._global_ticker :
-            self._data = self.scrape(ticker=ticker)
-            self._global_ticker = copy.deepcopy(ticker)
+    @scrape
+    def retrieveHolders(self,ticker=None) -> pd.DataFrame:
         major = self._data.major_holders
-        major.columns = ['%','Type']
         intis = self._data.institutional_holders
         mutual = self._data.mutualfund_holders
         holders = {'stats' : major, 
                     'ins' : intis,
-                    'mutual' : mutual
-                  }
+                    'mutual' : mutual}
         return holders
-    
-    def retrieveFinnancials(self,ticker=None):
-       pass 
+
+    @scrape
+    def retrieveActions(self, ticker=None) -> dict:
+        actions = { 'actions' : self._data.actions,
+                    'dividends' : self._data.dividends,
+                    'splits' : self._data.splits,
+                    'capital_gains' : self._data.capital_gains,}
+        return actions
+
+    @scrape
+    def retrieveFinancials(self, ticker=None, fargs = None, timeframe=None)-> dict:
+        financials = {}
+        if timeframe != None and fargs == None:
+            financials = {'shares' : self._data.get_shares_full(start=timeframe['start'],end=timeframe['end']),
+                          'income' : self._data.income_stmt,
+                          'quarterly_income' : self._data.quarterly_income_stmt,
+                          'balance' : self._data.balance_sheet,
+                          'quarterly_balance' : self._data.quarterly_balance_sheet,
+                          'cashflow' : self._data.cashflow,
+                          'quarterly_cashflow' : self._data.quarterly_cashflow}
+        elif timeframe == None and fargs == None:
+            financials = {'income' : self._data.income_stmt,
+                          'quarterly_income' : self._data.quarterly_income_stmt,
+                          'balance' : self._data.balance_sheet,
+                          'quarterly_balance' : self._data.quarterly_balance_sheet,
+                          'cashflow' : self._data.cashflow,
+                          'quarterly_cashflow' : self._data.quarterly_cashflow}
+        else :
+            for arg in fargs:
+                match arg:
+                    case 'income':
+                        financials[arg] = self._data.income_stmt
+                    case 'quarterly_income':
+                        financials[arg] = self._data.quarterly_income_stmt 
+                    case 'balance':
+                        financials[arg] = self._data.balance_sheet
+                    case 'quarterly_balance' :
+                        financials[arg] = self._data.quarterly_balance_sheet
+                    case 'cashflow':    
+                        financials[arg] = self._data.income_stmt
+                    case 'quarterly_cashflow':
+                        financials[arg] = self._data.quarterly_cashflow
+                    case 'shares':
+                        if timeframe != None:
+                            financials[arg] = self._data.get_shares_full(start=timeframe['start'],end=timeframe['end'])
+                        else :
+                            raise TypeError('Has shares in args but no timeframe')
+        return financials
+                            
 
 if __name__ == '__main__':
     scrape_session = Scrape()
-    history = scrape_session.retrieveHistory(ticker='AAPL',timeframe='1y')
-    print(history)
+    print(scrape_session.retrieveHistory(ticker='AAPL',timeframe='1y'))
     print(scrape_session.retrieveHolders(ticker='AAPL')['stats'])
-    print(scrape_session.retrieveHolders(ticker='AAPL')['ins'])   
+    print(scrape_session.retrieveActions(ticker='MSFT')['actions'])
+    print(scrape_session.retrieveFinancials(ticker='AAPL', fargs=['income','shares'], timeframe={'start' : '2020-01-01', 'end' : None})['income'])

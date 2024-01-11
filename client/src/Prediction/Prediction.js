@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 
 export default class Prediction extends Component {
-    render() {
+   
+	render() {
         return (
             <div>
           </div>
