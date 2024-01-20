@@ -35,6 +35,8 @@ class Scrape:
     @scrape  
     def retrieveHistory(self,ticker=None, timeframe='1y') -> pd.DataFrame :
         history_df = self._data.history(period=timeframe)
+        history_df.index = history_df.index.astype(str).str.replace(r'\s\d{2}:\d{2}:\d{2}-\d{2}:\d{2}', '', regex=True)
+        history_df = history_df.reset_index()
         return history_df
 
     @scrape

@@ -1,5 +1,6 @@
 import time
 import logging
+import math
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -15,11 +16,34 @@ def timer(func):
         return result
     return wrapper
 
-def parseRequests(request):
-    ticker = request.args.get('ticker')
-    timeframe = request.arg.get('timeframe')
-    if ticker is None:
-        error_response = {'error' : 'Missing parameters'}
-        return False
-    else :
-        return ticker, timeframe
+def row_to_dict(row):
+    return {
+            "date" : row['Date'],
+            "open" : row["Open"],
+            "high" : row["High"],
+            "low" : row["Open"],
+            "close" : row["Close"],
+            "volume" : row["Volume"],
+            }
+@timer
+def sieve_prime(start, end):
+    primes = set()
+    sieve = set(range(2, end+1))
+    while sieve:
+        prime = min(sieve)
+        if prime >= start:
+            primes.add(prime)
+        sieve -= set(range(prime, end+1, prime))
+    return primes
+
+@timer
+def prime_generator(minPrime,maxPrime):
+    cached_primes = sieve_prime(minPrime, maxPrime)
+    gcd_pairs = dict() 
+    for i in cached_primes:
+        pair_list = [j for j in cached_primes if math.gcd(i*j,(i-1)*(j-1))==1]
+        gcd_pairs[i] = pair_list
+    return gcd_pairs
+
+if __name__ == "__main__":
+    pairs = prime_generator(2, 10000)
