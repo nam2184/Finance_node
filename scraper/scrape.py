@@ -54,7 +54,6 @@ class Scrape:
             self._data = self.scrape(ticker=ticker)
             self._global_ticker = copy.deepcopy(ticker)
         major = self._data.major_holders
-        major.columns = ['%','Type']
         intis = self._data.institutional_holders
         mutual = self._data.mutualfund_holders
         holders = {'stats' : major, 
