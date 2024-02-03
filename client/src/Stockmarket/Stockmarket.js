@@ -8,7 +8,7 @@ const Stockmarket = () => {
 
 	console.log('Today:', currentDate.toISOString().slice(0, 10));
 	console.log('One year ago:', oneYearAgo.toISOString().slice(0, 10));
-    const apiUrl = `http://127.0.0.1:5000/api/history?ticker=AAPL&timeframe=1y`;
+  const apiUrl = `http://127.0.0.1:5000/api/history?ticker=AAPL&timeframe=1y`;
  
 
 	useEffect(() => {
@@ -25,8 +25,7 @@ const Stockmarket = () => {
 	    if (contentType && contentType.includes('application/json')) {
 		    // Parse JSON if it's present
 			const data = await response.json();
-			setBackendData(data);
-			console.log(backendData)
+			setBackendData(data);	
 		} else {
 			throw new Error('Response is not in JSON format');
 		}
@@ -42,8 +41,8 @@ const Stockmarket = () => {
 	return(
 		  <div>
 			{backendData.data?.map((row, index) => (
-				<div key ={index}>
-					
+				<div key={index}>
+				  <h5>Stock : {row.close}</h5>
 				</div>
 			))}
 		 </div>

@@ -45,5 +45,10 @@ def prime_generator(minPrime,maxPrime):
         gcd_pairs[i] = pair_list
     return gcd_pairs
 
+@timer
+def multiplicative(number):
+        gs = [i for i in range(1,10000) if math.gcd(number,i) == 1]
+        return gs
+
 if __name__ == "__main__":
     pairs = prime_generator(2, 10000)

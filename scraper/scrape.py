@@ -1,4 +1,3 @@
-import re
 from requests import Session
 from requests_cache import CacheMixin,SQLiteCache 
 from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
@@ -6,7 +5,7 @@ from pyrate_limiter import Duration, RequestRate, Limiter
 import yfinance as yf
 import copy
 import pandas as pd
-from utils import timer
+from .utils import timer
 
 class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
     pass

@@ -30,34 +30,7 @@ const extractParams = (req, res, next) => {
 
 app.use(extractParams)
 
-app.get('/api',	async (req, res) => {
-    const {ticker, start, end} = req.parsedParams()
-	
-    if (req.method === 'POST' && req.url === '/holders') {
-        let body = '';
-        try {
-          req.on('data', async (chunk) => {
-            body += chunk.toString();
-            const formData = JSON.parse(body);
-            const direction = formData.direction;
-            const postData = {
-              direction: direction,
-            };
-            const flaskResponse = await axios.post('http://127.0.0.1:5000/button-press', postData);
-            console.log(`Button pressed: ${direction}`);
-        // Forward the Flask server's response to the client
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(flaskResponse.data));
-          })
-        } catch (error) {
-          // Handle errors
-          console.error('Error:', error.message);
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Failed to forward request to Flask server' }));
-        }
 
-    
-  })
 
 const PORT = 3000;
 app.listen(PORT, () => {
