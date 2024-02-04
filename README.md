@@ -1,5 +1,7 @@
 # DailyFinance
 
+## Work in Progress
+
 ## Overview
 
 This Finance App is a full-stack web application built using React for the frontend, Node.js for the backend, and Python for scraping financial data from Yahoo Finance. Additionally, the app incorporates homomorphic encryption for secure machine learning operations on financial data.
