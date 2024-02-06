@@ -1,23 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import { useParams } from "react-router-dom"
-
-const filterParams = (query) => {
-    const timeframe = query.get('timeframe')  
-    
-    const queryParams = {
-        timeframe
-    };
-
-    return queryParams;
-}
-
-
+import { filterParams, fetchApi } from '../utils';
+import { useNavigate, createSearchParams } from 'react-router-dom';
 
 const Stockmarket = () => {
   const [timeframe, setTimeFrame] = useState({}); 
 	const [backendData, setBackendData] = useState ({});
   const { symbol } = useParams();
-
+  const navigate = useNavigate()
 	const currentDate = new Date();
 	const oneYearAgo = new Date(currentDate);
 	oneYearAgo.setFullYear(currentDate.getFullYear() - 1);
@@ -31,27 +21,19 @@ const Stockmarket = () => {
       const queryparams = new URLSearchParams(window.location.search);
       const params = filterParams(queryparams);
       const apiUrl = `http://127.0.0.1:5000/api/history?ticker=${symbol}&timeframe=${params.timeframe}`;
-      console.log(apiUrl);
-      try {
-          const response = await fetch(apiUrl, {
-			      method : 'GET',
-			      mode: 'cors',
-		      });
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-		      const contentType = response.headers.get('Content-Type');   
-	          if (contentType && contentType.includes('application/json')) {
-		        // Parse JSON if it's present
-			        const data = await response.json();
-			        setBackendData(data);
-              
-		        } else {
-			        throw new Error('Response is not in JSON format');
-		      }
-        } catch (error) {
-        console.error('Error fetching data:', error);
+
+      const data = fetchApi(apiUrl); 
+      if (!data) {
+         const default_params = {timeframe : '1y',};
+         navigate({
+          pathname:`/stock/AAPL`,
+          search:`?${createSearchParams(default_params)}`, 
+         });
       }
+      else {
+        setBackendData(data)
+      }
+
     };
 	fetchData();
   }, [symbol, timeframe]);
