@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from scrape import Scrape
-from utils import timer, row_to_dict
+from .scrape import Scrape
+from .utils import timer, row_to_dict
 
 app = Flask(__name__)
 session = Scrape()
