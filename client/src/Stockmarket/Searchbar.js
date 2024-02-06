@@ -14,7 +14,7 @@ const Searchbar = ( ) => {
   const handleSearch = () => { 
     navigate({
       pathname:`/stock/${symbol}`,
-      searc:`?${createSearchParams(params)}`, 
+      search:`?${createSearchParams(params)}`, 
     });
   };
 

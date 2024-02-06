@@ -17,7 +17,7 @@ export default class Navbar extends Component {
         <header className={style.box}>
         <Searchbar/>
         <nav className={style.navbar}>
-            <a href="/stockmarket" onClick={(e) => handleNavigation(e, '/stockmarket')}>Stockmarket</a>
+            <a href="/stockmarket" onClick={(e) => handleNavigation(e, '/stock/AAPL?timeframe=1y')}>Stockmarket</a>
             <a href="/prediction" onClick={(e) => handleNavigation(e, '/prediction')}>Predictions</a>
             <a href="/" onClick={(e) => handleNavigation(e, '/')}>Home</a>
         </nav>

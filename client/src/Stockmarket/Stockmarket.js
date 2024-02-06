@@ -21,10 +21,11 @@ const Stockmarket = () => {
       const queryparams = new URLSearchParams(window.location.search);
       const params = filterParams(queryparams);
       const apiUrl = `http://127.0.0.1:5000/api/history?ticker=${symbol}&timeframe=${params.timeframe}`;
-
-      const data = fetchApi(apiUrl); 
+      
+      const data = await fetchApi(apiUrl); 
       if (!data) {
          const default_params = {timeframe : '1y',};
+         console.log("No ticker of that name")
          navigate({
           pathname:`/stock/AAPL`,
           search:`?${createSearchParams(default_params)}`, 
@@ -32,11 +33,12 @@ const Stockmarket = () => {
       }
       else {
         setBackendData(data)
+        console.log(backendData)
       }
 
     };
 	fetchData();
-  }, [symbol, timeframe]);
+  }, [symbol]);
 
 
 	return(
