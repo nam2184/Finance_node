@@ -11,6 +11,8 @@ const filterParams = (query) => {
     return queryParams;
 }
 
+
+
 const Stockmarket = () => {
   const [timeframe, setTimeFrame] = useState({}); 
 	const [backendData, setBackendData] = useState ({});
@@ -43,9 +45,7 @@ const Stockmarket = () => {
 		        // Parse JSON if it's present
 			        const data = await response.json();
 			        setBackendData(data);
-              if (backendData.data?.length === 0) {
-                  
-              } 
+              
 		        } else {
 			        throw new Error('Response is not in JSON format');
 		      }
@@ -54,7 +54,8 @@ const Stockmarket = () => {
       }
     };
 	fetchData();
-  }, [symbol]);
+  }, [symbol, timeframe]);
+
 
 	return(
 		  <div>
