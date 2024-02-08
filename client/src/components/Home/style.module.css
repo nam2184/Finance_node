@@ -1,0 +1,31 @@
+.home {
+    display:flex;
+    align-items:center;
+    height:100vh;
+    padding:0 10%;
+}
+
+.home_content { 
+    max-width:600px;
+    margin-top:20px;
+}
+
+.home_content h1 {
+    font-size:56px;
+    color:white;
+    font-weight:700;
+}
+
+.home_content h3 {
+    font-size:30px;
+    color:white;
+    font-weight:500;
+}
+
+.home_content p {
+    font-size:20px;
+    color:white;
+    font-weight:300;
+}
+
+
